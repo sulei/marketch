@@ -18,12 +18,20 @@
             "shortcut": "",
             "name": "Get New Version",
             "identifier": "checkupdate"
+        },
+        {
+            "script": "debug.cocoascript",
+            "handler" : "onRun",
+            "shortcut": "",
+            "name": "debug",
+            "identifier": "debug"
         }
     ],
     "menu": {
         "items": [
             "export",
-            "checkupdate"
+            "checkupdate",
+            "debug"
         ],
         "title" : "marketch"
     },

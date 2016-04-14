@@ -1,0 +1,25 @@
+@import 'util.cocoascript';
+
+
+var onRun = function(context){
+    log("===== debug START =====");
+
+
+    var selection = context.selection;
+    //log("selected count:"+ selection[0].name);
+
+    var loop = selection.objectEnumerator();
+
+
+    while (item = loop.nextObject()) {
+      // do something with item
+      log(item.name());
+      log(item.className());
+      log(item.style());
+      log(item.isVisible());
+      log(item.isLocked());
+      log(item.parentGroup().name());
+    }
+
+    log("====== debug END ======");
+}
