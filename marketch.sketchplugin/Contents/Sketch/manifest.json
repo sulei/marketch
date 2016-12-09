@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "name": "marketch",
     "version": "1.0.17",
     "description": "",
@@ -34,6 +35,35 @@
             "debug"
         ],
         "title" : "marketch"
+=======
+  "name": "marketch",
+  "version": "1.0.19",
+  "description": "",
+  "author": "tudou527",
+  "authorEmail": "tudou527@gmail.com",
+  "commands": [
+    {
+      "script": "zip.cocoascript",
+      "handler" : "onRun",
+      "shortcut": "command shift m",
+      "name": "Export as zipFile",
+      "identifier": "export"
+>>>>>>> tudou527/master
     },
-    "identifier": "com.marketch.cosa.98908c77-3d38-48fa-8c7c-1bb465f67eb8",
+    {
+      "script": "checkupdate.cocoascript",
+      "handler" : "onRun",
+      "shortcut": "",
+      "name": "Get New Version",
+      "identifier": "checkupdate"
+    }
+  ],
+  "menu": {
+    "items": [
+      "export",
+      "checkupdate"
+    ],
+    "title" : "marketch"
+  },
+  "identifier": "com.marketch.cosa.98908c77-3d38-48fa-8c7c-1bb465f67eb8",
 }
