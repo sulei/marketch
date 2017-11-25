@@ -72,7 +72,7 @@ var Marketch = function(){
 Marketch.prototype = {
     /**
      * @param expConfig.layer {boolean} 是否导出图层为图片
-     * @param expConfig.artboard {string} 导出画板选项: selected|page|all
+     * @param expConfig.artboard {string} 导出画板选项: selected|page|all|all_nosymbols
      * @param expConfig.saveSource {boolean} 是否保存sketch源文件
      * @return 
      */
@@ -109,6 +109,22 @@ Marketch.prototype = {
             while(loopVar = loopObj.nextObject()){
                 // 不导出以单个“-”开头的页面和画板
                 if(!/^-{1}[^-]*?.*$/.test(loopVar.name())){
+                    var artloops = loopVar.artboards().objectEnumerator();
+                    while(artboard = artloops.nextObject()){
+                        if(!/^-{1}[^-]*?.*$/.test(artboard.name())){
+                            this.allArtboards.addObject(artboard);
+                        }
+                    }
+                }
+            }
+        }
+        
+        //导出所有画板
+        if(expConfig.artboard == 'all_nosymbols'){
+            loopObj = doc.pages().objectEnumerator();
+            while(loopVar = loopObj.nextObject()){
+                // 不导出以单个“-”开头的页面和画板
+                if(!/^-{1}[^-]*?.*$/.test(loopVar.name()) && loopVar.name() != "Symbols"){
                     var artloops = loopVar.artboards().objectEnumerator();
                     while(artboard = artloops.nextObject()){
                         if(!/^-{1}[^-]*?.*$/.test(artboard.name())){
@@ -287,7 +303,7 @@ Marketch.prototype = {
         artboardData.mask = {};
 
         while(theLayer = loopLayer.nextObject()){
-            var layerSize = theLayer.frameInArtboard().size;
+            var layerSize = theLayer.frame().size;//Sketch 41 Fix: frameInArtboard() = > frame()
             var layerId = util.toJSString(theLayer.objectID());
             //图层父节点id
             var parentGroupId = util.toJSString(theLayer.parentGroup().objectID());
@@ -372,6 +388,19 @@ Marketch.prototype = {
                         //导出形状组图片
                         exportLayerAsImage && this.exportLayerAsImage(theLayer, exportConfig);
                         break;
+
+                    //symbol类型
+                    case 'MSSymbolInstance':
+                        //保存形状数据
+                        layerData = util.getLayerData(theLayer, {type: 'symbol', zIndex: this.artboardZIndex});
+                        layerData && artboardData.layer.push(layerData);
+                        //导出形状组图片
+                        exportLayerAsImage && this.exportLayerAsImage(theLayer, exportConfig);
+                        break;
+
+                    default:
+                        //TODO
+                        break;
                 }
             }
 
@@ -387,7 +416,7 @@ Marketch.prototype = {
      * 64*64以内，并且不包含文字图层的图层可以按组导出
      */
     groupExportEnable: function(layer){
-        var frame = layer.frameInArtboard().size;
+        var frame = layer.frame().size;
         var parentLayer = layer.parentGroup();
         //搜索条件
         var predicate = NSPredicate.predicateWithFormat('className == "MSTextLayer"');
@@ -395,7 +424,7 @@ Marketch.prototype = {
         var textLayers = parentLayer.children().filteredArrayUsingPredicate(predicate);
 
         //图层尺寸小于64*64 并且不包含文字图层，
-        if(frame.width <= 64 && frame.height <= 64 && textLayers.count() == 0 && parentLayer.className() != 'MSArtboardGroup'){
+        if(frame.width <= 64 && frame.height <= 64 && textLayers.count() == 0 && parentLayer.className() != 'MSArtboardGroup' && parentLayer.className() != 'MSSymbolMaster'){
             return true;
         }
 
@@ -432,7 +461,7 @@ Marketch.prototype = {
         }
 
         //向上遍历
-        while(layer.className() != 'MSArtboardGroup'){
+        while(layer.className() != 'MSArtboardGroup' && layer.className() != 'MSSymbolMaster'){
             var theLayerId = util.toJSString(layer.objectID());
             //parenggroup不可见
             if(!layer.isVisible()){

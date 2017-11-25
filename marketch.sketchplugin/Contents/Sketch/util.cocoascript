@@ -158,6 +158,7 @@ var util = {
                 'SELECTEXPORTARTBOARD': '请选择要导出的画板',
                 'SELECTEDARTBOARD': '当前选中的画板',
                 'ARTBOARDONPAGE': '当前页面上的全部画板',
+                'ALLARTBOARDWITHOUTSYMBOLS' : '所有画板, 不包含Symbols',
                 'ALLARTBOARD': '所有画板(会比较慢)',
                 'EXPORTEVERYLAYER': '把每个图层作为图片导出',
                 'SAVESKETCHSOURCE': '保存sketch源文件',
@@ -200,6 +201,7 @@ var util = {
                 'SELECTEXPORTARTBOARD': 'Which artboard would you like to export?',
                 'SELECTEDARTBOARD': 'Selected Artboard(s)',
                 'ARTBOARDONPAGE': 'Artboards on Current Page',
+                'ALLARTBOARDWITHOUTSYMBOLS' : 'All Artboards with out Symbols',
                 'ALLARTBOARD': 'All Artboards',
                 'EXPORTEVERYLAYER': 'Export all layers as image',
                 'SAVESKETCHSOURCE': 'Save Sketch file',
@@ -342,7 +344,8 @@ var util = {
      */
     getLayerData: function(layer, config){
         //图层在画板中的位置、尺寸：frameInArtboard
-        var layerFrame = layer.frameInArtboard();
+        //Sketch 41 Fix: frameInArtboard() = > frame()
+        var layerFrame = layer.frame();
         var layerId = util.toJSString(layer.objectID());
         var nameConfig = (config.type == 'artboard') ? {encode: true, escapeLine:true} : {encode: true};
         //图层基本信息
@@ -351,11 +354,11 @@ var util = {
             //图层路径默认与图层id一致
             src: layerId,
             name: util.toJSString(layer.name(), nameConfig),
-            x: Math.ceil(layerFrame.origin.x),
-            y: Math.ceil(layerFrame.origin.y),
+            x: Math.ceil(layer.absoluteRect().x()),//Sketch 41 Fix: origin.x = > absoluteRect().x()
+            y: Math.ceil(layer.absoluteRect().y()),//Sketch 41 Fix: origin.y = > absoluteRect().y()
             zIndex: config.zIndex,
-            width: Math.ceil(layerFrame.size.width),
-            height: Math.ceil(layerFrame.size.height),
+            width: Math.ceil(layerFrame.width()),
+            height: Math.ceil(layerFrame.height()),
             sharedStyleType: '',
             sharedStyle: ''
         };
@@ -434,6 +437,11 @@ var util = {
             return layerData;
         }
 
+        //TODO 不知如何处理Symbol类型 -sulei
+        if(config.type == 'symbol'){
+            return layerData;
+        }
+
         //图形(layer.layers().firstObject()判断是否为空图形)
         if(config.type == 'shape' && layer.layers().firstObject() != null){
             var shapeClassName = layer.layers().firstObject().className();
@@ -472,6 +480,8 @@ var util = {
             }
             return layerData;
         }
+
+
 
         return null;
     },

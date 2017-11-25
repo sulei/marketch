@@ -123,7 +123,7 @@ input[type=text], textarea {outline:0;padding:3px;}
                 .sk-slice span {float:left;position:relative;z-index:0;width:35px;border-radius:2px;height:21px;line-height:21px;text-align:center;font-size:11px;color:#fff;background:rgba(0,0,0,.6);}
                 .sk-slice a img {position:absolute;z-index:1;width:100%;height:100%;opacity:0;}
     /**/
-    .panel {position:fixed;top:60px;z-index:0;right:-200px;bottom:0;padding:10px 10px 10px 10px;width:180px;color:#fff;background: #555c64;-webkit-transition:right 0.1s ease-in-out;}
+    .panel {overflow:auto;position:fixed;top:60px;z-index:0;right:-220px;bottom:0;padding:10px 10px 10px 10px;width:200px;color:#fff;background: #555c64;-webkit-transition:right 0.1s ease-in-out;}
     .panel-active {right:0;}
         .panel dl {margin-bottom:20px;line-height:23px;}
             .panel dt {color:#9CA3A7;overflow:hidden;}
@@ -729,18 +729,22 @@ Marketch.prototype = {
                 }
 
                 if(type == 'size' || type == 'format'){
-                    //修改导出图片路径
-                    var base = $('#export-btn').data('base');
-                    var exportScale = $('#panel').find('select[name=size]').val();
-                    var exportType = $('#panel').find('select[name=format]').val();
-                    var link = ''
-                    
-                    if(exportType == 'svg'){
-                        link = base +'.svg';
-                    }else{
-                        link = base +'@'+ exportScale +'.png'; 
-                    }
-                    $('#export-btn').attr('href', link).attr('download', link);
+                  //修改导出图片路径
+                  var base = $('#export-btn').data('base');
+                  var baseName = $('#export-btn').data('name');
+                  var exportScale = $('#panel').find('select[name=size]').val();
+                  var exportType = $('#panel').find('select[name=format]').val();
+                  var link = ''
+                  var name = ''
+
+                  if(exportType == 'svg'){
+                    link = base +'.svg';
+                    name = baseName + '.svg';
+                  }else{
+                    link = base +'@'+ exportScale +'.png';
+                    name = baseName +'@'+ exportScale +'.png';
+                  }
+                  $('#export-btn').attr('href', link).attr('download', name);
                 }
             }
         }).on('click', function(e){
@@ -926,7 +930,7 @@ Marketch.prototype = {
                         '</ul>',
                         '<div class="export-btn">',
                             '<a id="export-btn" href="javascript:;" data-base="', this.currentArtboardId ,'/', objectId ,'" ',
-                            'class="panel-export" download="">', this.I18N['EXPORTLAYER'] ,'</a>',
+                            'class="panel-export" download="" data-name="', layerData.name ,'">', this.I18N['EXPORTLAYER'] ,'</a>',
                         '</div>',
                     '</dd>',
                 '</dl>'

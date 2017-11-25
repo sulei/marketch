@@ -1,0 +1,34 @@
+@import 'export.cocoascript';
+
+var onRun = function(context){
+    log("========= debug START =========");
+
+  var sketch = context.api();
+
+  log("API Version: "+ sketch.api_version);
+  log("Sketch Version: "+ sketch.version);
+  log("Build: "+ sketch.build);
+  log("Full Version: "+ sketch.full_version);
+
+    var selection = context.selection;
+    //log("selected count:"+ selection[0].name);
+
+    var loop = selection.objectEnumerator();
+
+
+    while (item = loop.nextObject()) {
+      // do something with item
+      log("===== " + item.name() + " === " + item.className() + " ===== ");
+      log("style: " + item.style());
+      log("width: " + item.frame().width() + " height: " + item.frame().height())
+      log("isVisible: " + item.isVisible());
+      log("isLocked: " + item.isLocked());
+      log("parentGroup name: " + item.parentGroup().name());
+
+    }
+
+
+
+    log("========== debug END ==========");
+    log("asdasd");
+}
